@@ -1,0 +1,421 @@
+.father {
+  position: relative;
+}
+
+/* 横屏 */
+@media screen and (min-width: 700px) {
+  .backImage {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .backImage > img {
+    margin-left: 38%;
+    width: 25%;
+    height: 100%;
+  }
+  .btns {
+    position: absolute;
+    top: 3%;
+    right: 5%;
+    width: 80px;
+    height: 200px;
+    text-align: center;
+  }
+  .btns > li {
+    width: 18vw;
+    height: 20vh;
+  }
+  #skip {
+    width: 18vw;
+    height: 6vh;
+    line-height: 6vh;
+    text-align: center;
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    background-color: pink;
+  }
+  #models {
+    position: absolute;
+  }
+  #player {
+    width: 20vw;
+    position: absolute;
+    top: 2%;
+    right: 3%;
+    animation: jianjie 1.5s;
+  }
+  @keyframes jianjie {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 2%;
+    }
+  }
+  #player > img {
+    width: 30%;
+  }
+  .shiping {
+    width: 20vw;
+    position: absolute;
+    top: 32%;
+    right: 3%;
+    animation: shiping 1.5s;
+  }
+  .shiping > img {
+    width: 30%;
+  }
+  @keyframes yueqi {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 32%;
+    }
+  }
+
+  .yueqi {
+    width: 20vw;
+    position: absolute;
+    top: 61%;
+    right: 3%;
+    animation: yueqi 1.5s;
+  }
+  .yueqi > img {
+    width: 30%;
+  }
+  @keyframes shiping {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 61%;
+    }
+  }
+
+  #choose {
+    display: none;
+  }
+  a {
+    width: 50px;
+    height: 50px;
+  }
+  a > img {
+    width: 30%;
+  }
+  #audios {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+  }
+  #loadings {
+    width: 160px;
+    height: 90px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #update {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+    background: url("https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/loading.png");
+    animation: move 1.2s steps(12, end) infinite;
+  }
+  @keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: -1152px 0;
+    }
+  }
+}
+/* 竖屏 6:18 */
+@media screen and (max-width: 460px) and (min-width: 401px) {
+  .backImage {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .backImage > img {
+    width: 122%;
+    height: 100%;
+  }
+  .btns {
+    position: absolute;
+    top: 3%;
+    right: 5%;
+    width: 80px;
+    height: 200px;
+    text-align: center;
+  }
+  .btns > li {
+    width: 18vw;
+    height: 20vh;
+  }
+  #skip {
+    width: 18vw;
+    height: 6vh;
+    line-height: 6vh;
+    text-align: center;
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    background-color: pink;
+  }
+  #models {
+    position: absolute;
+  }
+  #player {
+    width: 20vw;
+    position: absolute;
+    top: 2%;
+    right: 3%;
+    animation: jianjie 1.5s;
+  }
+  @keyframes jianjie {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 2%;
+    }
+  }
+  #player > img {
+    width: 100%;
+  }
+  .shiping {
+    width: 20vw;
+    position: absolute;
+    top: 28%;
+    right: 3%;
+    animation: yueqi 1.5s;
+  }
+  .shiping > img {
+    width: 100%;
+  }
+  @keyframes yueqi {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 28%;
+    }
+  }
+
+  .yueqi {
+    width: 20vw;
+    position: absolute;
+    top: 53%;
+    right: 3%;
+    animation: shiping 1.5s;
+  }
+  .yueqi > img {
+    width: 100%;
+  }
+  @keyframes shiping {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 53%;
+    }
+  }
+
+  #choose {
+    display: none;
+  }
+  a {
+    width: 50px;
+    height: 50px;
+  }
+  a > img {
+    width: 100%;
+  }
+
+  #audios {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+  }
+  #loadings {
+    width: 160px;
+    height: 90px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #update {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+    background: url("https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/loading.png");
+    animation: move 1.2s steps(12, end) infinite;
+  }
+  @keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: -1152px 0;
+    }
+  }
+}
+/* 竖屏 9:18 */
+@media screen and (max-width: 400px) and (min-width: 330px) {
+  .backImage {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .backImage > img {
+    width: 122%;
+    height: 100%;
+  }
+  .btns {
+    position: absolute;
+    top: 3%;
+    right: 5%;
+    width: 80px;
+    height: 200px;
+    text-align: center;
+  }
+  .btns > li {
+    width: 18vw;
+    height: 20vh;
+  }
+  #skip {
+    width: 18vw;
+    height: 6vh;
+    line-height: 6vh;
+    text-align: center;
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    background-color: pink;
+  }
+  #models {
+    position: absolute;
+  }
+  #player {
+    width: 20vw;
+    position: absolute;
+    top: 2%;
+    right: 3%;
+    animation: jianjie 1.5s;
+  }
+  @keyframes jianjie {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 2%;
+    }
+  }
+  #player > img {
+    width: 100%;
+  }
+  .shiping {
+    width: 20vw;
+    position: absolute;
+    top: 28%;
+    right: 3%;
+    animation: yueqi 1.5s;
+  }
+  .shiping > img {
+    width: 100%;
+  }
+  @keyframes yueqi {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 28%;
+    }
+  }
+
+  .yueqi {
+    width: 20vw;
+    position: absolute;
+    top: 53%;
+    right: 3%;
+    animation: shiping 1.5s;
+  }
+  .yueqi > img {
+    width: 100%;
+  }
+  @keyframes shiping {
+    0% {
+      top: -20%;
+    }
+
+    100% {
+      top: 53%;
+    }
+  }
+
+  #choose {
+    display: none;
+  }
+  a {
+    width: 50px;
+    height: 50px;
+  }
+  a > img {
+    width: 100%;
+  }
+
+  #audios {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+  }
+  #loadings {
+    width: 160px;
+    height: 90px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #update {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+    background: url("https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/loading.png");
+    animation: move 1.2s steps(12, end) infinite;
+  }
+  @keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: -1152px 0;
+    }
+  }
+}

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>二胡</title>
+    <link rel="stylesheet" href="../../asset/css/default.css" />
+    <link rel="stylesheet" href="../../asset/css/config.css" />
+    <script src="../../asset/js/Tween.js"></script>
+  </head>
+
+  <body>
+    <div id="easyAR"></div>
+    <div class="father">
+      <!-- 模型 -->
+      <div id="loadings">
+        <div id="update"></div>
+      </div>
+      <div id="models"></div>
+      <div class="backImage">
+        <img src="../../asset/images/扉页底缩小.jpg" />
+      </div>
+      <ul id="btns" class="btns">
+        <li id="xuanzhou">
+          <img id="img6" src="../../asset/images/琴轴-1.png" />
+        </li>
+        <li id="qianjin">
+          <img id="img7" src="../../asset/images/千斤-1.png" />
+        </li>
+        <li id="xuan">
+          <img id="img8" src="../../asset/images/弦-1.png" />
+        </li>
+        <li id="qintong">
+          <img id="img9" src="../../asset/images/琴简-1.png" />
+        </li>
+        <li id="gong">
+          <img id="img0" src="../../asset/images/琴弓-1.png" />
+        </li>
+      </ul>
+      <ul class="foots">
+        <li id="fangda">
+          <img id="img1" src="../../asset/images/放大-1.png" />
+        </li>
+        <li id="suoxiao">
+          <img id="img2" src="../../asset/images/缩小-1.png" />
+        </li>
+        <li id="youzhuan">
+          <img id="img3" src="../../asset/images/右转-1.png" />
+        </li>
+        <li id="zuozhuan">
+          <img id="img4" src="../../asset/images/左转-1.png" />
+        </li>
+        <li id="guiwei">
+          <img id="img5" src="../../asset/images/重置-1.png" />
+        </li>
+      </ul>
+      <audio id="audios" style="display: none" controls></audio>
+      <div id="yueqi">
+        <img id="img11" src="../../asset/images/二胡-1.png"/>
+      </div>
+    </div>
+
+    <script type="module">
+      import * as THREE from "../../asset/js/three.module.js";
+      import { TransformControls } from "../../asset/js/TransformControls.js";
+      import { FBXLoader } from "../../asset/js/FBXLoader.js";
+      let camera, scene, renderer;
+      let mouse = new THREE.Vector2();
+      let mixer;
+      let guqinMesh;
+      let nCase = 0;
+      let object;
+      var rotation = new THREE.Euler();
+      let pos_x, pos_y, pos_z;
+      let ros_x, ros_y, ros_z;
+      var endQuaternion;
+      var toRot;
+      let Now = 0;
+      let Init = 0;
+      let ruchang = true;
+      let speed = 175;
+      const curveHandles = [];
+      let points, nIdx, updateCurve, curve;
+      const btns = document.getElementById("btns");
+      //放大，缩小，右转，左转
+      let fd = false;
+      let sx = false;
+      let yz = false;
+      let zz = false;
+      let ZY = false;
+      let ZZ = false;
+      let XY = false;
+      let XZ = false;
+      // 禁用右键菜单
+      document.onselectstart = function () {
+        return false;
+      };
+      document.oncontextmenu = function () {
+        return false;
+      };
+      document.oncopy = function () {
+        return false;
+      };
+
+      init();
+    
+
+      // 模型代码========================================
+      // 加载模型
+      function loadFbxInScence() {
+        // 模型
+        const loader = new FBXLoader();
+        // 导入模型
+        const getTexture = new THREE.TextureLoader().load(
+          // 古琴
+          "https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/erhu_d.png"
+        );
+        const getNTexture = new THREE.TextureLoader().load(
+          "https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/erhu_n.png"
+        );
+        guqinMesh = loader.load(
+          "https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/erhu.FBX",
+          function (object) {
+            object.traverse((child) => {
+              let material = new THREE.MeshPhongMaterial({
+                map: getTexture,
+                normalMap: getNTexture,
+                transparent: true,
+              });
+              child.material = material;
+              if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+              }
+            });
+
+            object.scale.set(1, 1, 1);
+            nIdx = 0;
+            object.position.x = points[nIdx].x;
+            object.position.y = points[nIdx].y;
+            object.position.z = points[nIdx].z;
+            object.name = "erhu";
+
+            object.rotation.x = 0;
+            object.rotation.y = -0.5;
+            object.rotation.z = 0;
+            scene.add(object);
+            console.log(scene);
+          },
+          (p) => {
+        const val = Math.ceil(p.loaded / p.total * 100);
+        if (val >= 100) {
+        setTimeout(() => {
+          document.getElementById("loadings").style.display = "none";
+          Update();
+          animate();
+        }, 1000);
+        }
+       
+    }
+        );
+      }
+
+      function Update() {
+        if (ruchang) {
+          let nihao = scene.getObjectByName("erhu");
+          if (nihao != null && nihao.name != "") {
+            nihao.position.x = points[nIdx].x;
+            nihao.position.y = points[nIdx].y;
+            nihao.position.z = points[nIdx].z;
+            if (nihao.position.x == points[points.length - 1].x)
+              ruchang = false;
+            nIdx++;
+            if (nIdx >= speed) {
+              nIdx = speed;
+              btns.style.display = "block";
+              yueqi.style.display = "block";
+            }
+          }
+        }
+        requestAnimationFrame(Update);
+        switch (nCase) {
+          //缩放还原
+          case 1:
+            if (object.scale.x > 0.61) {
+              object.scale.x -= 0.01;
+              object.scale.y -= 0.01;
+              object.scale.z -= 0.01;
+            }
+            if (object.scale.x < 0.59) {
+              object.scale.x += 0.01;
+              object.scale.y += 0.01;
+              object.scale.z += 0.01;
+            }
+            if (object.scale.x >= 0.59 && object.scale.x <= 0.61) {
+              object.scale.set(0.6, 0.6, 0.6);
+              move(pos_x, pos_y, pos_z);
+              nCase = 2;
+            }
+            console.log(object.scale.x);
+            break;
+          case 2: //旋转
+            if (
+              !(
+                object.rotation.x > ros_x - 0.02 &&
+                object.rotation.x < ros_x + 0.02
+              )
+            ) {
+              if (object.rotation.x < ros_x) object.rotation.x += 0.01;
+              else {
+                object.rotation.x -= 0.01;
+              }
+            }
+            if (
+              !(
+                object.rotation.y > ros_y - 0.05 &&
+                object.rotation.y < ros_y + 0.05
+              )
+            ) {
+              if (object.rotation.y <= ros_y) object.rotation.y += 0.05;
+              else {
+                object.rotation.y -= 0.05;
+              }
+            }
+            if (
+              !(
+                object.rotation.z > ros_z - 0.02 &&
+                object.rotation.z < ros_z + 0.02
+              )
+            ) {
+              if (object.rotation.z <= ros_z) object.rotation.z += 0.01;
+              else {
+                object.rotation.z -= 0.01;
+              }
+            }
+            if (
+              object.rotation.x > ros_x - 0.02 &&
+              object.rotation.x < ros_x + 0.02 &&
+              object.rotation.y > ros_y - 0.05 &&
+              object.rotation.y < ros_y + 0.05 &&
+              object.rotation.z > ros_z - 0.02 &&
+              object.rotation.z < ros_z + 0.02
+            ) {
+              object.rotation.x = ros_x;
+              object.rotation.z = ros_z;
+              object.rotation.y = ros_y;
+              nCase = 0;
+            }
+            break;
+          case 5: //放大
+            if (fd) {
+              object = scene.getObjectByName("erhu");
+              if (object.scale.x < 2) {
+                object.scale.x += 0.01;
+                object.scale.y += 0.01;
+                object.scale.z += 0.01;
+              }
+            }
+            break;
+          case 6: //缩小
+            if (sx) {
+              object = scene.getObjectByName("erhu");
+              if (object.scale.x > 0.3) {
+                object.scale.x -= 0.01;
+                object.scale.y -= 0.01;
+                object.scale.z -= 0.01;
+              }
+            }
+            break;
+          case 7: //右转
+            if (yz) {
+              object = scene.getObjectByName("erhu");
+              object.rotation.y += 0.01;
+            }
+            break;
+          case 8: //左转
+            if (zz) {
+              object = scene.getObjectByName("erhu");
+              object.rotation.y -= 0.01;
+            }
+            break;
+        }
+        renderer.clear();
+        renderer.render(scene, camera);
+      }
+      var pointLight;
+      function init() {
+        // 插入标签
+        const container = document.getElementById("models");
+        // 相机
+        camera = new THREE.PerspectiveCamera(
+          45,
+          window.innerWidth / window.innerHeight,
+          1,
+          3000
+        );
+        camera.position.set(0, 0, 80);
+
+        // 场景
+        scene = new THREE.Scene();
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+        hemiLight.position.set(0, 200, 0);
+        scene.add(hemiLight);
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(0, 150, 0);
+        spotLight.castShadow = true; // 光源投射阴影
+        spotLight.shadow.mapSize.width = 2048; // 必须是 2的幂，默认值为 512
+        spotLight.shadow.mapSize.height = 2048; // 必须是 2的幂，默认值为 512
+        scene.add(spotLight);
+
+        pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(0, -7, 0);
+        pointLight.castShadow = true;
+        pointLight.shadow.camera.near = 0.1;
+        pointLight.shadow.camera.far = 25;
+
+        // 曲线动画
+        const initialPoints = [
+          // 手机端二胡显示
+          { x: 180, y: 240, z: -800 },
+          { x: -80, y: 110, z: -660 },
+          { x: -30, y: 120, z: -470 },
+          { x: 80, y: 140, z: -450 },
+          { x: 60, y: 80, z: -370 },
+          { x: 5, y: 0, z: -120 },
+          // 手机端古琴显示
+        ];
+
+        const boxGeometry = new THREE.BoxGeometry(5, 5, 5);
+        const boxMaterial = new THREE.MeshBasicMaterial();
+
+        for (const handlePos of initialPoints) {
+          const handle = new THREE.Mesh(boxGeometry, boxMaterial);
+          handle.position.copy(handlePos);
+          curveHandles.push(handle);
+        }
+        //曲线
+        curve = new THREE.CatmullRomCurve3(
+          curveHandles.map((handle) => handle.position)
+        );
+        curve.curveType = "catmullrom";
+        curve.closed = false;
+        points = curve.getPoints(speed);
+        // 渲染
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+        renderer.domElement.addEventListener("mousedown", (event) => {
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+       setTimeout(() => {
+        loadFbxInScence();
+       }, 1500);
+      }
+      // 音频点击按钮
+      const audios = document.getElementById("audios");
+
+      const img6 = document.getElementById("img6");
+      const img7 = document.getElementById("img7");
+      const img8 = document.getElementById("img8");
+      const img9 = document.getElementById("img9");
+      const img0 = document.getElementById("img0");
+      const img11 = document.getElementById("img11");
+      const url =
+        "https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/";
+      // 播放音频按键
+      function show_hidden(audios, s) {
+        btns.style.display = "none";
+        yueqi.style.display = "none";
+        audios.src = s;
+        audios.addEventListener(
+          "ended",
+          function () {
+            btns.style.display = "block";
+            yueqi.style.display = "block";
+            audios.style.display = "none";
+            audios.load();
+            img6.src = "../../asset/images/琴轴-1.png";
+            img7.src = "../../asset/images/千斤-1.png";
+            img8.src = "../../asset/images/弦-1.png";
+            img9.src = "../../asset/images/琴简-1.png";
+            img0.src = "../../asset/images/琴弓-1.png";
+            img11.src = "../../asset/images/二胡-1.png";
+          },
+          false
+        );
+        if (audios.style.display == "none") {
+          audios.style.display = "block";
+          audios.play();
+        }
+      }
+      document.getElementById("yueqi").addEventListener("click", () => {
+        let src = url + "二胡.mp3";
+        img11.src = "../../asset/images/二胡-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+      });
+      document.getElementById("xuanzhou").addEventListener("click", () => {
+        let src =  url + "琴轴.mp3";
+        img6.src = "../../asset/images/琴轴-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+
+        object = scene.getObjectByName("erhu");
+        pos_x = 5;
+        pos_y = -25;
+        pos_z = 0;
+
+        ros_x = 0;
+
+        let max = parseInt((4.76 - object.rotation.y) / 6.28);
+
+        ros_y = 4.76 - max * 6.28;
+        ros_z = 0;
+        nCase = 1;
+
+        pointLight.position.set(8, -21, 0);
+      });
+      document.getElementById("qianjin").addEventListener("click", () => {
+        let src =  url + "千斤.mp3";
+        img7.src = "../../asset/images/千斤-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+        object = scene.getObjectByName("erhu");
+        pos_x = 3.77;
+        pos_y = -5;
+        pos_z = 30;
+
+        ros_x = 0;
+        let max = parseInt((4.76 - object.rotation.y) / 6.28);
+
+        ros_y = 4.76 - max * 6.28;
+
+        ros_z = -0.68;
+        nCase = 1;
+        pointLight.position.set(5, -4.84, 30);
+      });
+      document.getElementById("xuan").addEventListener("click", () => {
+        let src =  url + "二胡弦.mp3";
+        img8.src = "../../asset/images/弦-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+        object = scene.getObjectByName("erhu");
+        pos_x = 8;
+        pos_y = 0;
+        pos_z = -10;
+        nCase = 1;
+
+        ros_x = 0;
+        let max = parseInt((5.76 - object.rotation.y) / 6.28);
+
+        ros_y = 5.76 - max * 6.28;
+
+        //  console.log
+        ros_z = 0;
+      });
+      document.getElementById("qintong").addEventListener("click", () => {
+        let src =  url + "琴筒.mp3";
+        img9.src = "../../asset/images/琴简-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+        object = scene.getObjectByName("erhu");
+        pos_x = 3;
+        pos_y = 20;
+        pos_z = -10;
+
+        ros_x = 0;
+        let max = parseInt((5.26 - object.rotation.y) / 6.28);
+
+        ros_y = 5.26 - max * 6.28;
+        ros_z = 0;
+        nCase = 1;
+      });
+      document.getElementById("gong").addEventListener("click", () => {
+        let src =  url + "琴弓.mp3";
+        img0.src = "../../asset/images/琴弓-2.png";
+        setTimeout(() => {
+          show_hidden(audios, src);
+        }, 300);
+        object = scene.getObjectByName("erhu");
+        pos_x = -7;
+        pos_y = 10;
+        pos_z = -40;
+
+        ros_x = 0;
+        let max = parseInt((5.26 - object.rotation.y) / 6.28);
+
+        ros_y = 5.26 - max * 6.28;
+        ros_z = 0;
+        nCase = 1;
+      });
+
+      document.getElementById("guiwei").addEventListener("click", () => {
+        object = scene.getObjectByName("erhu");
+        console.log(object);
+        pos_x = 5;
+        pos_y = 0;
+        pos_z = -120;
+
+        ros_x = 0;
+        let max = parseInt((0 - object.rotation.y) / 6.28);
+
+        ros_y = 0 - max * 6.28;
+        ros_z = 0;
+        nCase = 1;
+      });
+      function move(x, y, z) {
+        var pos = object.position;
+        console.log(pos);
+        var target = { x, y, z };
+        console.log(target);
+        var tween2 = new TWEEN.Tween(pos)
+          .to(target, 2000)
+          .easing(TWEEN.Easing.Quadratic.InOut);
+        tween2.start();
+      }
+      function animate() {
+        requestAnimationFrame(animate);
+        TWEEN.update(); // 一定要在动画循环函数里面更新TWEEN！！
+
+        renderer.render(scene, camera);
+      }
+      function rotateMatrix(rotateStart, rotateEnd) {
+        var axis = new THREE.Vector3(),
+          quaternion = new THREE.Quaternion();
+
+        var angle = Math.acos(
+          rotateStart.dot(rotateEnd) / rotateStart.length() / rotateEnd.length()
+        );
+
+        if (angle) {
+          axis.crossVectors(rotateStart, rotateEnd).normalize();
+          angle *= rotationSpeed;
+          quaternion.setFromAxisAngle(axis, angle);
+        }
+        return quaternion;
+      }
+
+      const fangda = document.getElementById("fangda");
+      const suoxiao = document.getElementById("suoxiao");
+      const youzhuan = document.getElementById("youzhuan");
+      const zuozhuan = document.getElementById("zuozhuan");
+      const guiwei = document.getElementById("guiwei");
+      const img1 = document.getElementById("img1");
+      const img2 = document.getElementById("img2");
+      const img3 = document.getElementById("img3");
+      const img4 = document.getElementById("img4");
+      const img5 = document.getElementById("img5");
+
+      fangda.addEventListener("touchstart", function (event) {
+        img1.src = "../../asset/images/放大-2.png";
+        nCase = 5;
+        fd = true;
+      });
+      fangda.addEventListener("touchend", function (event) {
+        img1.src = "../../asset/images/放大-1.png";
+        nCase = 0;
+        fd = false;
+      });
+      suoxiao.addEventListener("touchstart", function (event) {
+        img2.src = "../../asset/images/缩小-2.png";
+        nCase = 6;
+        sx = true;
+      });
+      suoxiao.addEventListener("touchend", function (event) {
+        img2.src = "../../asset/images/缩小-1.png";
+        nCase = 0;
+        sx = false;
+      });
+      youzhuan.addEventListener("touchstart", function (event) {
+        img3.src = "../../asset/images/右转-2.png";
+        nCase = 7;
+        yz = true;
+      });
+      youzhuan.addEventListener("touchend", function (event) {
+        img3.src = "../../asset/images/右转-1.png";
+        nCase = 0;
+        yz = false;
+      });
+      zuozhuan.addEventListener("touchstart", function (event) {
+        img4.src = "../../asset/images/左转-2.png";
+        nCase = 8;
+        zz = true;
+      });
+      zuozhuan.addEventListener("touchend", function (event) {
+        img4.src = "../../asset/images/左转-1.png";
+        nCase = 0;
+        zz = false;
+      });
+      guiwei.addEventListener("touchstart", function (event) {
+        btns.style.display = "block";
+        yueqi.style.display = "block";
+        audios.style.display = "none";
+        audios.load();
+        img5.src = "../../asset/images/重置-2.png";
+        img6.src = "../../asset/images/琴轴-1.png";
+        img7.src = "../../asset/images/千斤-1.png";
+        img8.src = "../../asset/images/弦-1.png";
+        img9.src = "../../asset/images/琴简-1.png";
+        img0.src = "../../asset/images/琴弓-1.png";
+        img11.src = "../../asset/images/二胡-1.png";
+      });
+      guiwei.addEventListener("touchend", function (event) {
+        img5.src = "../../asset/images/重置-1.png";
+      });
+    </script>
+  </body>
+</html>

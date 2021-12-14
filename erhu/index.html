@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>赛马</title>
+    <link rel="stylesheet" href="../../asset/css/default.css" />
+    <link rel="stylesheet" href="../../asset/css/index.css" />
+  </head>
+  <body>
+    <div id="father" class="father">
+      <!-- 加载动画 -->
+      <div id="loadings">
+        <div id="update"></div>
+      </div>
+      <!-- 模型 -->
+      <div id="models"></div>
+
+      <div class="backImage">
+        <img src="../../asset/images/赛马.jpg" />
+        <div id="choose">
+          <div id="player">
+            <img id="img1" src="../../asset/images/讲故事-1.png" />
+          </div>
+
+          <div class="shiping">
+            <img id="img2" src="../../asset/images/听音乐-1.png" />
+          </div>
+          <div class="yueqi">
+            <img id="img3" src="../../asset/images/乐器简介-1.png" />
+          </div>
+          <audio
+            id="audios"
+            style="display: none"
+            src="https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/07赛马.mp3"
+            controls
+          ></audio>
+        </div>
+      </div>
+    </div>
+    <script src="../../asset/js/config.js"></script>
+    <script type="module">
+      import { init, animate, actions } from "../../asset/js/common.js";
+      let Now = 0;
+      let Init = 0;
+      const audios = document.getElementById("audios");
+      const img1 = document.getElementById("img1");
+      audios.addEventListener(
+        "ended",
+        function () {
+          img1.src = "../../asset/images/讲故事-1.png";
+          audios.style.display = "none";
+          audios.load();
+        },
+        false
+      );
+      audios.addEventListener("pause", function () {
+        actions[1].stop();
+        actions[0].play();
+      });
+      audios.addEventListener("play", function () {
+        actions[0].stop();
+        actions[1].play();
+      });
+      img1.addEventListener("click", () => {
+        show_hidden(audios, img1);
+      });
+      // 播放音频的开关
+      function show_hidden(audios, img) {
+        if (audios.style.display == "none") {
+          img.src = "../../asset/images/讲故事-2.png";
+          audios.style.display = "block";
+          audios.play();
+          actions[0].stop();
+          actions[1].play()
+        } else {
+          audios.style.display = "none";
+          audios.load();
+          actions[1].stop();
+          actions[0].play();
+          img.src = "../../asset/images/讲故事-1.png";
+        }
+      }
+      // =================================================
+      const img2 = document.getElementById("img2");
+      img2.addEventListener("click", () => {
+        img2.src = "../../asset/images/听音乐-2.png";
+        location.href = "video.html";
+      });
+
+      const img3 = document.getElementById("img3");
+      img3.addEventListener("click", () => {
+        img3.src = "../../asset/images/乐器简介-2.png";
+        location.href = "model.html";
+      });
+      // 模型代码========================================
+      window.onload = function () {
+        let timer = setInterval(function () {
+          Now++;
+          switch (Init) {
+            case 0:
+              if (Now >= 10 && Now < 51) {
+                // 环境调用
+                init();
+                Init = 1;
+              }
+              break;
+            case 1:
+              if (Now >= 100) {
+                // 动画调用
+                clearInterval(timer);
+                document.getElementById("loadings").style.display = "none";
+                document.getElementById("choose").style.display = "block";
+                animate();
+              }
+              break;
+          }
+        }, 40);
+      };
+    </script>
+  </body>
+</html>
