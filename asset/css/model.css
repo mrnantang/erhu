@@ -54,7 +54,7 @@ img {
 
   .foots {
     position: absolute;
-    top: 90%;
+    top: 88%;
     left: 50%;
     transform: translateX(-50%);
     width: 98%;
@@ -83,7 +83,6 @@ img {
     position: fixed;
     top: 7%;
     width: 24vw;
-    height: 11vh;
     animation: show 1s;
   }
   #yueqi > img {
