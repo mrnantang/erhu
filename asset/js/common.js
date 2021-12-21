@@ -4,6 +4,7 @@ let camera, scene, renderer;
 let mouse = new THREE.Vector2();
 let mixer;
 let actions = []; //所有的动画数组;
+let asd = [0,2.2];//动画开始播放前的等待时长单位s
 const clock = new THREE.Clock();
 let init = function init() {
     // 插入标签
@@ -61,19 +62,18 @@ let init = function init() {
      function loadFbxInScence() {
         // 模型
         const loader = new FBXLoader();
+        const url = "https://lz06-1301325388.cos.ap-chengdu.myqcloud.com/temp/ar/";
         // 导入模型
         const getTexture = new THREE.TextureLoader().load(
           // 导入贴图
-          "../../asset/model/DrF_DefaultMaterial_Diffuse.png"
+          url+"DrF_DefaultMaterial_Diffuse.png"
         );
         const getNTexture = new THREE.TextureLoader().load(
           // 导入贴图
-          "../../asset/model/DrF_DefaultMaterial_Normal.png"
+          url+"DrF_DefaultMaterial_Normal.png"
         );
-
-        let asd = [0,2.2];
         // 导入模型
-        loader.load("../../asset/model/法兰克博士@ani12.14+++.fbx", (object) => {
+        loader.load(url + "DrFrank12.14.fbx", (object) => {
           mixer = new THREE.AnimationMixer(object);
           for (let i = 0; i < object.animations.length; i++) {
             actions[i] = mixer.clipAction(object.animations[i]);
@@ -99,6 +99,14 @@ let init = function init() {
           object.scale.setScalar(2);
           object.position.set(0, -20, 0);
           scene.add(object);
+        },(p) =>{
+          const val = Math.ceil(p.loaded / p.total * 100);
+          if (val >= 100) {
+            document.getElementById("loadings").style.display = "none";
+           setTimeout(() => {
+            document.getElementById("choose").style.display = "block";
+           }, 1000);
+          }
         }
         );
       }
@@ -110,4 +118,4 @@ let init = function init() {
         renderer.clear();
         renderer.render(scene, camera);
       }
-    export {animate,init,actions}
+    export {animate,init,actions,asd}

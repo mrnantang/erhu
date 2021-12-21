@@ -41,11 +41,14 @@
     </div>
     <script src="../../asset/js/config.js"></script>
     <script type="module">
-      import { init, animate, actions } from "../../asset/js/common.js";
+      import { init, animate, actions,asd} from "../../asset/js/common.js";
+      init()
+      animate()
       let Now = 0;
       let Init = 0;
       const audios = document.getElementById("audios");
       const img1 = document.getElementById("img1");
+      
       audios.addEventListener(
         "ended",
         function () {
@@ -60,7 +63,9 @@
         actions[0].play();
       });
       audios.addEventListener("play", function () {
+        
         actions[0].stop();
+        actions[1].time = asd[1];
         actions[1].play();
       });
       img1.addEventListener("click", () => {
@@ -73,6 +78,7 @@
           audios.style.display = "block";
           audios.play();
           actions[0].stop();
+          actions[1].time = asd[1];
           actions[1].play()
         } else {
           audios.style.display = "none";
@@ -94,30 +100,6 @@
         img3.src = "../../asset/images/乐器简介-2.png";
         location.href = "model.html";
       });
-      // 模型代码========================================
-      window.onload = function () {
-        let timer = setInterval(function () {
-          Now++;
-          switch (Init) {
-            case 0:
-              if (Now >= 10 && Now < 51) {
-                // 环境调用
-                init();
-                Init = 1;
-              }
-              break;
-            case 1:
-              if (Now >= 100) {
-                // 动画调用
-                clearInterval(timer);
-                document.getElementById("loadings").style.display = "none";
-                document.getElementById("choose").style.display = "block";
-                animate();
-              }
-              break;
-          }
-        }, 40);
-      };
     </script>
   </body>
 </html>
